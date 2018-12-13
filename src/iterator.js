@@ -11,3 +11,19 @@ export const obj = {
 
 var vals = [...obj];
 console.log(vals);
+
+const number = {
+  *[Symbol.iterator]({ start = 0, step = 1, end = 100 } = {}) {
+    for (let i = start; i <= end; i = i + step) {
+      yield i;
+    }
+  }
+};
+
+for (let num of number) {
+  console.log(num);
+}
+
+for (let num of number[Symbol.iterator]({ start: 3, step: 4, end: 30 })) {
+  console.log(num);
+}
