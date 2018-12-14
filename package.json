@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha --require @babel/register -- ./src/**/*.test.js",
     "start": "babel-node server.js"
   },
   "author": "",
@@ -15,9 +15,14 @@
     "@babel/preset-env": "^7.2.0",
     "babel-loader": "^8.0.4",
     "express": "^4.16.4",
+    "mocha": "^5.2.0",
     "webpack": "^4.27.1",
     "webpack-cli": "^3.1.2",
     "webpack-dev-middleware": "^3.4.0",
     "webpack-hot-middleware": "^2.24.3"
+  },
+  "devDependencies": {
+    "@babel/register": "^7.0.0",
+    "expect": "^23.6.0"
   }
 }
