@@ -82,12 +82,19 @@ export function fetchForeCast(city) {
   return operation;
 }
 
+export function fetchCurrentCityThatFails(city) {
+  const operation = new Operation();
+  setTimeout(function() {
+    operation.fail('GPS broken');
+  }, 20);
+  return operation;
+}
+
 export function Operation() {
   const operation = {
     successReactions: [],
     errorReactions: []
   };
-  const noop = function() {};
   operation.fail = function(error) {
     operation.state = 'failed';
     operation.error = error;
@@ -99,19 +106,37 @@ export function Operation() {
     operation.successReactions.forEach(s => s(result));
   };
   operation.onCommplete = function(onSuccess, onError) {
+    const proxyOp = new Operation();
+
+    function successHandler() {
+      if (onSuccess) {
+        const callBackResult = onSuccess(operation.result);
+        if (callBackResult && callBackResult.onCommplete) {
+          callBackResult.forwardCompletion(proxyOp);
+        }
+      }
+    }
+
+    function errorHandler() {
+      if (onError) {
+        const callBackResult = onError(operation.error);
+        proxyOp.succeed(callBackResult);
+      }
+    }
+
     switch (operation.state) {
       case 'succeeded':
-        onSuccess(operation.result);
+        successHandler();
         break;
       case 'failed':
-        onError(operation.error);
+        errorHandler();
         break;
       default:
-        operation.successReactions.push(onSuccess || noop);
-        operation.errorReactions.push(onError || noop);
+        operation.successReactions.push(successHandler);
+        operation.errorReactions.push(errorHandler);
         break;
     }
-    return new Operation();
+    return proxyOp;
   };
   operation.onFailure = function onFailure(onError) {
     return operation.onCommplete(null, onError);
@@ -123,7 +148,8 @@ export function Operation() {
     }
     operation.succeed(result);
   };
-
+  operation.then = operation.onCommplete;
+  operation.catch = operation.onFailure;
   operation.forwardCompletion = function(op) {
     operation.onCommplete(op.succeed, op.fail);
   };

@@ -5,9 +5,11 @@ import {
   fetchCurrentCity,
   fetchWeather,
   fetchForeCast,
-  Operation
+  Operation,
+  fetchCurrentCityThatFails
 } from './operation';
 import { callDone } from './multiDone';
+import expect from 'expect';
 
 describe('Callback examples', () => {
   it('Nesting serial async dependencies', done => {
@@ -242,6 +244,18 @@ describe('Callback examples', () => {
       console.log(weather);
       done();
     }
+  });
+
+  it.only('error recovery', function(done) {
+    fetchCurrentCityThatFails()
+      .onFailure(function(error) {
+        console.log(error);
+        return 'default city';
+      })
+      .then(function(city) {
+        expect(city).toBe('default city');
+        done();
+      });
   });
 
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
