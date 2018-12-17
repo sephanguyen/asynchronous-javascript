@@ -226,10 +226,22 @@ describe('Callback examples', () => {
   });
 
   it.only(`life is full of async, nesting is inevitable, let's do somthing about it`, function(done) {
-    let weatherOp = fetchCurrentCity().onCommplete(function(city) {
-      fetchWeather(city).forwardCompletion(weatherOp);
-    });
-    weatherOp.onCommplete(weather => done());
+    // let weatherOp = fetchCurrentCity().onCommplete(function(city) {
+    //   fetchWeather(city).forwardCompletion(weatherOp);
+    // });
+    // weatherOp.onCommplete(weather => done());
+
+    // let weartherOp = fetchCurrentCity().onCommplete(function(city) {
+    //   return fetchWeather(city);
+    // });
+    // weartherOp.onCommplete(wearther => done());
+    fetchCurrentCity()
+      .then(fetchWeather)
+      .then(printTheWeather);
+    function printTheWeather(weather) {
+      console.log(weather);
+      done();
+    }
   });
 
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
