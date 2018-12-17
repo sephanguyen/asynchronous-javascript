@@ -90,6 +90,15 @@ export function fetchCurrentCityThatFails(city) {
   return operation;
 }
 
+export function fetchCurrentCityIndecisive(city) {
+  const operation = new Operation();
+  setTimeout(function() {
+    operation.succeed('NYC');
+    operation.succeed('Philly');
+  }, 20);
+  return operation;
+}
+
 export function Operation() {
   const operation = {
     successReactions: [],
@@ -101,6 +110,10 @@ export function Operation() {
     operation.errorReactions.forEach(r => r(error));
   };
   operation.succeed = function(result) {
+    if (operation.complete) {
+      return;
+    }
+    operation.complete = true;
     operation.state = 'succeeded';
     operation.result = result;
     operation.successReactions.forEach(s => s(result));

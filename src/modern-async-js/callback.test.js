@@ -6,7 +6,8 @@ import {
   fetchWeather,
   fetchForeCast,
   Operation,
-  fetchCurrentCityThatFails
+  fetchCurrentCityThatFails,
+  fetchCurrentCityIndecisive
 } from './operation';
 import { callDone } from './multiDone';
 import expect from 'expect';
@@ -327,6 +328,9 @@ describe('Callback examples', () => {
       });
   });
 
+  it.only('protect from doubling up on success', function(done) {
+    fetchCurrentCityIndecisive().then(e => done());
+  });
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();
