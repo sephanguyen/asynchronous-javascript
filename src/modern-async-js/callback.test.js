@@ -336,6 +336,25 @@ describe('Callback examples', () => {
   it.only('protect from doubling up on failures', function(done) {
     fetchCurrentCityRepeatedFailures().catch(e => done());
   });
+
+  it.only('ensure success handlers are async', function(done) {
+    const operation = new Operation();
+    operation.succeed('New york, NY');
+    operation.then(function(city) {
+      doneAlias();
+    });
+    const doneAlias = done;
+  });
+
+  it.only('ensure error handlers are async', function(done) {
+    const operation = new Operation();
+    operation.fail(new Error('Oh noes'));
+    operation.catch(function(city) {
+      doneAlias();
+    });
+    const doneAlias = done;
+  });
+
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();

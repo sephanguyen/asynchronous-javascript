@@ -135,41 +135,47 @@ export function Operation() {
     const proxyOp = new Operation();
 
     function successHandler() {
-      let callBackResult;
-      if (onSuccess) {
-        try {
-          callBackResult = onSuccess(operation.result);
-        } catch (error) {
-          proxyOp.fail(error);
-          return;
+      setTimeout(() => {
+        if (onSuccess) {
+          let callBackResult;
+
+          try {
+            callBackResult = onSuccess(operation.result);
+          } catch (error) {
+            proxyOp.fail(error);
+            return;
+          }
+          if (callBackResult && callBackResult.onCommplete) {
+            callBackResult.forwardCompletion(proxyOp);
+            return;
+          }
+          proxyOp.succeed(callBackResult);
+        } else {
+          proxyOp.succeed(operation.result);
         }
-        if (callBackResult && callBackResult.onCommplete) {
-          callBackResult.forwardCompletion(proxyOp);
-          return;
-        }
-        proxyOp.succeed(callBackResult);
-      } else {
-        proxyOp.succeed(operation.result);
-      }
+      });
     }
 
     function errorHandler() {
-      let callBackResult;
-      if (onError) {
-        try {
-          callBackResult = onError(operation.error);
-        } catch (error) {
-          proxyOp.fail(error);
-          return;
+      setTimeout(() => {
+        if (onError) {
+          let callBackResult;
+
+          try {
+            callBackResult = onError(operation.error);
+          } catch (error) {
+            proxyOp.fail(error);
+            return;
+          }
+          if (callBackResult && callBackResult.onCommplete) {
+            callBackResult.forwardCompletion(proxyOp);
+            return;
+          }
+          proxyOp.succeed(callBackResult);
+        } else {
+          proxyOp.fail(operation.error);
         }
-        if (callBackResult && callBackResult.onCommplete) {
-          callBackResult.forwardCompletion(proxyOp);
-          return;
-        }
-        proxyOp.succeed(callBackResult);
-      } else {
-        proxyOp.fail(operation.error);
-      }
+      });
     }
 
     switch (operation.state) {
