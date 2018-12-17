@@ -115,6 +115,7 @@ export function Operation() {
           callBackResult = onSuccess(operation.result);
         } catch (error) {
           proxyOp.fail(error);
+          return;
         }
         if (callBackResult && callBackResult.onCommplete) {
           callBackResult.forwardCompletion(proxyOp);
@@ -127,8 +128,14 @@ export function Operation() {
     }
 
     function errorHandler() {
+      let callBackResult;
       if (onError) {
-        const callBackResult = onError(operation.error);
+        try {
+          callBackResult = onError(operation.error);
+        } catch (error) {
+          proxyOp.fail(error);
+          return;
+        }
         if (callBackResult && callBackResult.onCommplete) {
           callBackResult.forwardCompletion(proxyOp);
           return;

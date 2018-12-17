@@ -311,6 +311,22 @@ describe('Callback examples', () => {
       .catch(e => done());
   });
 
+  it.only('error,  error recovery', function(done) {
+    fetchCurrentCity()
+      .then(function(city) {
+        throw new Error('oh no');
+        return fetchWeather(city);
+      })
+      .catch(e => {
+        expect(e.message).toBe('oh no');
+        throw new Error('Error from an error handler');
+      })
+      .catch(e => {
+        expect(e.message).toBe('Error from an error handler');
+        done();
+      });
+  });
+
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();
