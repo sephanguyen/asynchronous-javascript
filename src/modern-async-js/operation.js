@@ -99,12 +99,25 @@ export function fetchCurrentCityIndecisive(city) {
   return operation;
 }
 
+export function fetchCurrentCityRepeatedFailures(city) {
+  const operation = new Operation();
+  setTimeout(function() {
+    operation.fail(new Error('I failed'));
+    operation.fail(new Error('I failed again'));
+  }, 20);
+  return operation;
+}
+
 export function Operation() {
   const operation = {
     successReactions: [],
     errorReactions: []
   };
   operation.fail = function(error) {
+    if (operation.complete) {
+      return;
+    }
+    operation.complete = true;
     operation.state = 'failed';
     operation.error = error;
     operation.errorReactions.forEach(r => r(error));

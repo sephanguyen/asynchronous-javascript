@@ -7,7 +7,8 @@ import {
   fetchForeCast,
   Operation,
   fetchCurrentCityThatFails,
-  fetchCurrentCityIndecisive
+  fetchCurrentCityIndecisive,
+  fetchCurrentCityRepeatedFailures
 } from './operation';
 import { callDone } from './multiDone';
 import expect from 'expect';
@@ -330,6 +331,10 @@ describe('Callback examples', () => {
 
   it.only('protect from doubling up on success', function(done) {
     fetchCurrentCityIndecisive().then(e => done());
+  });
+
+  it.only('protect from doubling up on failures', function(done) {
+    fetchCurrentCityRepeatedFailures().catch(e => done());
   });
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
