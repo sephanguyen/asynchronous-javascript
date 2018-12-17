@@ -85,7 +85,7 @@ export function fetchForeCast(city) {
 export function fetchCurrentCityThatFails(city) {
   const operation = new Operation();
   setTimeout(function() {
-    operation.fail('GPS broken');
+    operation.fail(new Error('GPS broken'));
   }, 20);
   return operation;
 }
@@ -114,13 +114,21 @@ export function Operation() {
         if (callBackResult && callBackResult.onCommplete) {
           callBackResult.forwardCompletion(proxyOp);
         }
+      } else {
+        proxyOp.succeed(operation.result);
       }
     }
 
     function errorHandler() {
       if (onError) {
         const callBackResult = onError(operation.error);
+        if (callBackResult && callBackResult.onCommplete) {
+          callBackResult.forwardCompletion(proxyOp);
+          return;
+        }
         proxyOp.succeed(callBackResult);
+      } else {
+        proxyOp.fail(operation.error);
       }
     }
 

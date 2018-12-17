@@ -246,7 +246,7 @@ describe('Callback examples', () => {
     }
   });
 
-  it.only('error recovery', function(done) {
+  it.only('sync error recovery', function(done) {
     fetchCurrentCityThatFails()
       .onFailure(function(error) {
         console.log(error);
@@ -254,6 +254,42 @@ describe('Callback examples', () => {
       })
       .then(function(city) {
         expect(city).toBe('default city');
+        done();
+      });
+  });
+
+  it.only('async error recovery', function(done) {
+    fetchCurrentCityThatFails()
+      .onFailure(function() {
+        return fetchCurrentCity();
+      })
+      .then(function(city) {
+        expect(city).toBe('New York, NY');
+        done();
+      });
+  });
+
+  it.only('error recovery bypassed if not needed', function(done) {
+    fetchCurrentCity()
+      .onFailure(function() {
+        return 'default city';
+      })
+      .then(function(city) {
+        expect(city).toBe('New York, NY');
+        done();
+      });
+  });
+
+  it.only('error fallthought', function(done) {
+    fetchCurrentCityThatFails()
+      .then(fetchForeCast)
+      .then(function(foreCast) {
+        expect(foreCast).toBe({
+          fiveDay: [60, 70, 80, 45, 50]
+        });
+        done();
+      })
+      .catch(error => {
         done();
       });
   });
