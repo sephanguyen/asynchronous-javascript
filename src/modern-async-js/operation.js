@@ -113,7 +113,9 @@ export function Operation() {
         const callBackResult = onSuccess(operation.result);
         if (callBackResult && callBackResult.onCommplete) {
           callBackResult.forwardCompletion(proxyOp);
+          return;
         }
+        proxyOp.succeed(callBackResult);
       } else {
         proxyOp.succeed(operation.result);
       }

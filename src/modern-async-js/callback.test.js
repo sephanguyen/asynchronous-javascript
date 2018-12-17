@@ -294,6 +294,14 @@ describe('Callback examples', () => {
       });
   });
 
+  it.only('sync result transfomation', function(done) {
+    fetchCurrentCity().then(function(city) {
+      const zip = '10019';
+      expect(zip).toBe('10019');
+      done();
+    });
+  });
+
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();
