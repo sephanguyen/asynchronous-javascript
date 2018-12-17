@@ -2,7 +2,8 @@ import {
   getCurrentCity,
   getForecast,
   getWeather,
-  fetchCurrentCity
+  fetchCurrentCity,
+  fetchWeather
 } from './operation';
 import { callDone } from './multiDone';
 
@@ -152,10 +153,29 @@ describe('Callback examples', () => {
     operation.onFailure(error => done(error));
   });
 
-  it.only('register only success handler inores error handler', function(done) {
-    const operation = fetchCurrentCity();
-    operation.onCommplete(result => done(new Error(`shouldn't succed `)));
-    operation.onFailure(error => done(error));
+  // it.only('register only success handler inores error handler', function(done) {
+  //   const operation = fetchCurrentCity();
+  //   operation.onCommplete(result => done(new Error(`shouldn't succed `)));
+  //   operation.onFailure(error => done(error));
+  // });
+
+  it.only('register success callback async', function(done) {
+    var currentCity = fetchCurrentCity();
+
+    setTimeout(function() {
+      currentCity.onCommplete(function(city) {
+        fetchWeather(city);
+        done();
+      });
+    }, 1);
+  });
+
+  it.only('register error callback async', function(done) {
+    var operationThatErrors = fetchWeather();
+
+    setTimeout(function() {
+      operationThatErrors.onFailure(() => done());
+    }, 1);
   });
 
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
