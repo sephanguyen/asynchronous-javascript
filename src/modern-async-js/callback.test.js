@@ -3,7 +3,9 @@ import {
   getForecast,
   getWeather,
   fetchCurrentCity,
-  fetchWeather
+  fetchWeather,
+  fetchForeCast,
+  Operation
 } from './operation';
 import { callDone } from './multiDone';
 
@@ -176,6 +178,58 @@ describe('Callback examples', () => {
     setTimeout(function() {
       operationThatErrors.onFailure(() => done());
     }, 1);
+  });
+
+  it.only('Parallel result synchronization', done => {
+    const city = 'NYC';
+
+    let weatherData;
+    let forecastData;
+    getWeather(city, function(error, weather) {
+      weatherData = weather;
+      console.log('wearther ', weather);
+      finishIfReady();
+    });
+    getForecast(city, function(error, forecast) {
+      forecastData = forecast;
+      console.log('forecast ', forecast);
+      finishIfReady();
+    });
+    function finishIfReady() {
+      if (weatherData && forecastData) {
+        // could add logic here to update UI all at once
+        console.log('both done!');
+        done();
+        return;
+      }
+      console.log('not done yet');
+    }
+
+    console.log(`Weather for ${city}:`);
+  });
+
+  it.only('lexical parallelism', function(done) {
+    const city = 'NYC';
+    const weartherOp = fetchWeather(city);
+    const forecastOp = fetchForeCast(city);
+    console.log('before completion handlers');
+    weartherOp.onCommplete(function(weather) {
+      forecastOp.onCommplete(function(forecast) {
+        console.log(
+          `It's currently ${
+            weather.temp
+          } in ${city} with a five day forecast of ${forecast.fiveDay}`
+        );
+        done();
+      });
+    });
+  });
+
+  it.only(`life is full of async, nesting is inevitable, let's do somthing about it`, function(done) {
+    let weatherOp = fetchCurrentCity().onCommplete(function(city) {
+      fetchWeather(city).forwardCompletion(weatherOp);
+    });
+    weatherOp.onCommplete(weather => done());
   });
 
   // it.only('pass multipe  callbacks - all of them are called', function(done) {

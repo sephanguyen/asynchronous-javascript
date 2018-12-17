@@ -82,7 +82,7 @@ export function fetchForeCast(city) {
   return operation;
 }
 
-function Operation() {
+export function Operation() {
   const operation = {
     successReactions: [],
     errorReactions: []
@@ -111,9 +111,10 @@ function Operation() {
         operation.errorReactions.push(onError || noop);
         break;
     }
+    return new Operation();
   };
   operation.onFailure = function onFailure(onError) {
-    operation.onCommplete(null, onError);
+    return operation.onCommplete(null, onError);
   };
   operation.nodeCallback = function(error, result) {
     if (error) {
@@ -121,6 +122,10 @@ function Operation() {
       return;
     }
     operation.succeed(result);
+  };
+
+  operation.forwardCompletion = function(op) {
+    operation.onCommplete(op.succeed, op.fail);
   };
 
   return operation;
