@@ -302,6 +302,15 @@ describe('Callback examples', () => {
     });
   });
 
+  it.only('throw error recovery', function(done) {
+    fetchCurrentCity()
+      .then(function(city) {
+        throw new Error('oh no');
+        return fetchWeather(city);
+      })
+      .catch(e => done());
+  });
+
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();
