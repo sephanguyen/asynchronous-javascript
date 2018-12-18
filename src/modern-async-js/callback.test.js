@@ -338,8 +338,9 @@ describe('Callback examples', () => {
   });
 
   it.only('ensure success handlers are async', function(done) {
-    const operation = new Operation();
-    operation.resolve('New york, NY');
+    const operation = new Operation(function(resole, reject) {
+      resolve('New york, NY');
+    });
     operation.then(function(city) {
       doneAlias();
     });
@@ -347,8 +348,9 @@ describe('Callback examples', () => {
   });
 
   it.only('ensure error handlers are async', function(done) {
-    const operation = new Operation();
-    operation.reject(new Error('Oh noes'));
+    const operation = new Operation(function(resole, reject) {
+      reject('Oh noes');
+    });
     operation.catch(function(city) {
       doneAlias();
     });

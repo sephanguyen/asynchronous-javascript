@@ -108,19 +108,18 @@ export function fetchCurrentCityRepeatedFailures(city) {
   return operation;
 }
 
-export function Operation() {
+export function Operation(excutor) {
   const operation = {
     successReactions: [],
     errorReactions: []
   };
-  function fail(error) {
-    if (operation.complete) {
+  operation.reject = function(error) {
+    if (operation.resolved) {
       return;
     }
-    operation.complete = true;
+    operation.resolved = true;
     internalReject(error);
-  }
-  operation.reject = fail;
+  };
 
   function internalReject(error) {
     operation.state = 'failed';
@@ -140,10 +139,10 @@ export function Operation() {
   }
 
   operation.resolve = function resolve(value) {
-    if (operation.complete) {
+    if (operation.resolved) {
       return;
     }
-    operation.complete = true;
+    operation.resolved = true;
     internalResolve(value);
   };
 
@@ -215,6 +214,9 @@ export function Operation() {
   // operation.forwardCompletion = function(op) {
   //   operation.onCommplete(op.resolve, op.fail);
   // };
+  if (excutor) {
+    excutor(operation.resolve, operation.reject);
+  }
 
   return operation;
 }
