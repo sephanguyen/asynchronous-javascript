@@ -355,6 +355,18 @@ describe('Callback examples', () => {
     const doneAlias = done;
   });
 
+  it.only('what is resolve?', function(done) {
+    const fetchCurrentCity = new Operation();
+    fetchCurrentCity.succeed('NYC');
+
+    const fetchClone = new Operation();
+    fetchClone.resolve(fetchCurrentCity);
+
+    fetchClone.then(function(city) {
+      expect(city).toBe('NYC');
+      done();
+    });
+  });
   // it.only('pass multipe  callbacks - all of them are called', function(done) {
   //   const operation = fetchCurrentCity();
   //   const multipeDone = callDone(done).afterTwoCalls();

@@ -122,6 +122,7 @@ export function Operation() {
     operation.error = error;
     operation.errorReactions.forEach(r => r(error));
   };
+  operation.reject = operation.fail;
   operation.succeed = function(result) {
     if (operation.complete) {
       return;
@@ -131,6 +132,15 @@ export function Operation() {
     operation.result = result;
     operation.successReactions.forEach(s => s(result));
   };
+
+  operation.resolve = function resolve(value) {
+    if (value && value.onCommplete) {
+      value.forwardCompletion(operation);
+      return;
+    }
+    operation.succeed(value);
+  };
+
   operation.onCommplete = function(onSuccess, onError) {
     const proxyOp = new Operation();
 
@@ -145,11 +155,7 @@ export function Operation() {
             proxyOp.fail(error);
             return;
           }
-          if (callBackResult && callBackResult.onCommplete) {
-            callBackResult.forwardCompletion(proxyOp);
-            return;
-          }
-          proxyOp.succeed(callBackResult);
+          proxyOp.resolve(callBackResult);
         } else {
           proxyOp.succeed(operation.result);
         }
@@ -167,11 +173,7 @@ export function Operation() {
             proxyOp.fail(error);
             return;
           }
-          if (callBackResult && callBackResult.onCommplete) {
-            callBackResult.forwardCompletion(proxyOp);
-            return;
-          }
-          proxyOp.succeed(callBackResult);
+          proxyOp.resolve(callBackResult);
         } else {
           proxyOp.fail(operation.error);
         }
