@@ -12,6 +12,7 @@ import {
 } from './operation';
 import { callDone } from './multiDone';
 import expect from 'expect';
+import { rejects } from 'assert';
 
 describe('Callback examples', () => {
   it('Nesting serial async dependencies', done => {
@@ -338,20 +339,14 @@ describe('Callback examples', () => {
   });
 
   it.only('ensure success handlers are async', function(done) {
-    const operation = new Operation(function(resolve, reject) {
-      resolve('New york, NY');
-    });
-    operation.then(function(city) {
+    Operation.resolve('New York City').then(function(city) {
       doneAlias();
     });
     const doneAlias = done;
   });
 
   it.only('ensure error handlers are async', function(done) {
-    const operation = new Operation(function(resolve, reject) {
-      reject('Oh noes');
-    });
-    operation.catch(function(city) {
+    Operation.reject(new Error('oh noes')).catch(function(city) {
       doneAlias();
     });
     const doneAlias = done;

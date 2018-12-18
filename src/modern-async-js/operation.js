@@ -115,7 +115,7 @@ export function fetchCurrentCityRepeatedFailures(city) {
   return operation;
 }
 
-export function Operation(excutor) {
+const Operation = function Operation(excutor) {
   const operation = {
     successReactions: [],
     errorReactions: []
@@ -226,4 +226,17 @@ export function Operation(excutor) {
   }
 
   return operation;
-}
+};
+
+Operation.reject = function(reason) {
+  return new Operation(function(resolve, reject) {
+    reject(reason);
+  });
+};
+
+Operation.resolve = function(value) {
+  return new Operation(function(resolve, reject) {
+    resolve(value);
+  });
+};
+export { Operation };
