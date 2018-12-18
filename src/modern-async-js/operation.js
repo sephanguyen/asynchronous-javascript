@@ -85,7 +85,7 @@ export function fetchForeCast(city) {
 export function fetchCurrentCityThatFails(city) {
   const operation = new Operation();
   setTimeout(function() {
-    operation.fail(new Error('GPS broken'));
+    operation.reject(new Error('GPS broken'));
   }, 20);
   return operation;
 }
@@ -93,8 +93,8 @@ export function fetchCurrentCityThatFails(city) {
 export function fetchCurrentCityIndecisive(city) {
   const operation = new Operation();
   setTimeout(function() {
-    operation.succeed('NYC');
-    operation.succeed('Philly');
+    operation.resolve('NYC');
+    operation.resolve('Philly');
   }, 20);
   return operation;
 }
@@ -102,8 +102,8 @@ export function fetchCurrentCityIndecisive(city) {
 export function fetchCurrentCityRepeatedFailures(city) {
   const operation = new Operation();
   setTimeout(function() {
-    operation.fail(new Error('I failed'));
-    operation.fail(new Error('I failed again'));
+    operation.reject(new Error('I failed'));
+    operation.reject(new Error('I failed again'));
   }, 20);
   return operation;
 }
@@ -113,7 +113,7 @@ export function Operation() {
     successReactions: [],
     errorReactions: []
   };
-  operation.fail = function(error) {
+  function fail(error) {
     if (operation.complete) {
       return;
     }
@@ -121,9 +121,9 @@ export function Operation() {
     operation.state = 'failed';
     operation.error = error;
     operation.errorReactions.forEach(r => r(error));
-  };
-  operation.reject = operation.fail;
-  operation.succeed = function(result) {
+  }
+  operation.reject = fail;
+  function succeed(result) {
     if (operation.complete) {
       return;
     }
@@ -131,14 +131,15 @@ export function Operation() {
     operation.state = 'succeeded';
     operation.result = result;
     operation.successReactions.forEach(s => s(result));
-  };
+  }
 
   operation.resolve = function resolve(value) {
     if (value && value.onCommplete) {
-      value.forwardCompletion(operation);
+      // value.forwardCompletion(operation);
+      value.then(operation.resolve, operation.reject);
       return;
     }
-    operation.succeed(value);
+    succeed(value);
   };
 
   operation.onCommplete = function(onSuccess, onError) {
@@ -152,12 +153,12 @@ export function Operation() {
           try {
             callBackResult = onSuccess(operation.result);
           } catch (error) {
-            proxyOp.fail(error);
+            proxyOp.reject(error);
             return;
           }
           proxyOp.resolve(callBackResult);
         } else {
-          proxyOp.succeed(operation.result);
+          proxyOp.resolve(operation.result);
         }
       });
     }
@@ -170,12 +171,12 @@ export function Operation() {
           try {
             callBackResult = onError(operation.error);
           } catch (error) {
-            proxyOp.fail(error);
+            proxyOp.reject(error);
             return;
           }
           proxyOp.resolve(callBackResult);
         } else {
-          proxyOp.fail(operation.error);
+          proxyOp.reject(operation.error);
         }
       });
     }
@@ -195,20 +196,20 @@ export function Operation() {
     return proxyOp;
   };
   operation.onFailure = function onFailure(onError) {
-    return operation.onCommplete(null, onError);
+    return operation.then(null, onError);
   };
   operation.nodeCallback = function(error, result) {
     if (error) {
-      operation.fail(error);
+      operation.reject(error);
       return;
     }
-    operation.succeed(result);
+    operation.resolve(result);
   };
   operation.then = operation.onCommplete;
   operation.catch = operation.onFailure;
-  operation.forwardCompletion = function(op) {
-    operation.onCommplete(op.succeed, op.fail);
-  };
+  // operation.forwardCompletion = function(op) {
+  //   operation.onCommplete(op.resolve, op.fail);
+  // };
 
   return operation;
 }

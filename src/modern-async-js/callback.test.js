@@ -339,7 +339,7 @@ describe('Callback examples', () => {
 
   it.only('ensure success handlers are async', function(done) {
     const operation = new Operation();
-    operation.succeed('New york, NY');
+    operation.resolve('New york, NY');
     operation.then(function(city) {
       doneAlias();
     });
@@ -348,7 +348,7 @@ describe('Callback examples', () => {
 
   it.only('ensure error handlers are async', function(done) {
     const operation = new Operation();
-    operation.fail(new Error('Oh noes'));
+    operation.reject(new Error('Oh noes'));
     operation.catch(function(city) {
       doneAlias();
     });
@@ -357,7 +357,7 @@ describe('Callback examples', () => {
 
   it.only('what is resolve?', function(done) {
     const fetchCurrentCity = new Operation();
-    fetchCurrentCity.succeed('NYC');
+    fetchCurrentCity.resolve('NYC');
 
     const fetchClone = new Operation();
     fetchClone.resolve(fetchCurrentCity);
