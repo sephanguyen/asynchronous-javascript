@@ -118,28 +118,33 @@ export function Operation() {
       return;
     }
     operation.complete = true;
+    internalReject(error);
+  }
+  operation.reject = fail;
+
+  function internalReject(error) {
     operation.state = 'failed';
     operation.error = error;
     operation.errorReactions.forEach(r => r(error));
   }
-  operation.reject = fail;
-  function succeed(result) {
+
+  function internalResolve(value) {
+    if (value && value.then) {
+      // value.forwardCompletion(operation);
+      value.then(internalResolve, internalReject);
+      return;
+    }
+    operation.state = 'succeeded';
+    operation.result = value;
+    operation.successReactions.forEach(s => s(value));
+  }
+
+  operation.resolve = function resolve(value) {
     if (operation.complete) {
       return;
     }
     operation.complete = true;
-    operation.state = 'succeeded';
-    operation.result = result;
-    operation.successReactions.forEach(s => s(result));
-  }
-
-  operation.resolve = function resolve(value) {
-    if (value && value.onCommplete) {
-      // value.forwardCompletion(operation);
-      value.then(operation.resolve, operation.reject);
-      return;
-    }
-    succeed(value);
+    internalResolve(value);
   };
 
   operation.onCommplete = function(onSuccess, onError) {
