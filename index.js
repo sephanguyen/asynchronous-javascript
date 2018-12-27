@@ -18,6 +18,8 @@ console.log(msg);
 // );
 
 const meGenerator = me();
-assistant(meGenerator).catch(function rejectionReaction(err) {
-  console.log('recover from error: ' + err);
-});
+assistant(meGenerator)
+  .catch(function rejectionReaction(err) {
+    console.log('recover from error: ' + err);
+  })
+  .then(`Assistant is done`);

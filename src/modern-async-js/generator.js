@@ -26,6 +26,7 @@ export function assistant(generator) {
         return;
       }
       if (next.done) {
+        resolve();
         return;
       }
       const promise = Promise.resolve(next.value);
