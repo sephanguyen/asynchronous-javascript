@@ -1,6 +1,7 @@
 import foo from './src/tagFunction';
 import * as abc from './src/iterator';
-import { fetchCurrentCity } from './src/modern-async-js/operation';
+import { me, assistant } from './src/modern-async-js/generator';
+// import { fetchCurrentCity } from './src/modern-async-js/operation';
 let name = 'Hand';
 let orderNumber = '123';
 let total = 319.7;
@@ -10,8 +11,11 @@ order (#${orderNumber}) was $${total}.`;
 
 console.log(msg);
 
-const operation = fetchCurrentCity();
-operation.setCallBacks(
-  result => console.log(result),
-  error => console.log(error)
-);
+// const operation = fetchCurrentCity();
+// operation.setCallBacks(
+//   result => console.log(result),
+//   error => console.log(error)
+// );
+
+const meGenerator = me();
+assistant(meGenerator);
